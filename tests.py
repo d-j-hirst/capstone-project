@@ -30,10 +30,6 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "db_test"
-        self.database_path = "postgresql://{}@{}/{}".format(
-            'postgres:a', 'localhost:5432', self.database_name)
-        setup_db(self.app)
 
         # binds the app to the current context
         with self.app.app_context():
@@ -49,6 +45,12 @@ class TriviaTestCase(unittest.TestCase):
     def test_test(self):
         """Test that successful tests actually work"""
         self.assertEqual(200, 200)
+
+    def test_index(self):
+        res = self.client().get('/test')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
