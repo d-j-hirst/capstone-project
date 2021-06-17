@@ -20,8 +20,6 @@ def setup_db(app, database_path=database_path):
     db.app = app
     db.init_app(app)
     db.create_all()
-    print('Databases created')
-    print(database_path)
 
 class Movie(db.Model):
     __tablename__ = 'movies'
