@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, DateTime
 from flask_sqlalchemy import SQLAlchemy
 import os
+import datetime
 
 # Get the database path from an environment variable
 # Heroku automatically generates a DATABASE_URL beginning with
@@ -26,7 +27,7 @@ class Movie(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    release_date = Column(DateTime())
+    release_date = Column(DateTime(), default=datetime.datetime.now(datetime.timezone.utc))
 
 class Actors(db.Model):
     __tablename__ = 'actors'

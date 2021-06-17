@@ -1,9 +1,21 @@
 import unittest
 import json
+import os
 from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app
-from models import setup_db
+from models import database_path
+
+# Get the database path from an environment variable
+# Heroku automatically generates a DATABASE_URL beginning with
+#  "postgres://" (which can't be easily edited), while SQLAlchemy in
+#  its latest version will only work with "postgresql://". This
+#  adjustment allows compatibility between the two by converting
+#  the scheme of Heroku's URL
+database_path = os.environ.get('DATABASE_URL').replace("s://", "sql://", 1)
+# replace the database name with this to run the tests - we don't want to
+# overwrite persistent data in the regular database
+database_path = database_path.rsplit('/', 1)[0] + '/capstone_test_db'
 
 
 error_names = {400: 'Bad Request',
@@ -26,30 +38,34 @@ def test_error_format(test_obj, res, code):
 
 class TriviaTestCase(unittest.TestCase):
 
+    # Define test variables and initialize app.
     def setUp(self):
-        """Define test variables and initialize app."""
-        self.app = create_app()
+        self.app = create_app({'database_path': database_path})
         self.client = self.app.test_client
 
-        # binds the app to the current context
-        with self.app.app_context():
-            self.db = SQLAlchemy()
-            self.db.init_app(self.app)
-            # create all tables
-            self.db.create_all()
-
+    # Executed after each test
     def tearDown(self):
-        """Executed after each test"""
         pass
 
+    # Test that successful tests actually work
     def test_test(self):
-        """Test that successful tests actually work"""
         self.assertEqual(200, 200)
 
+    # Test trivial I/O to make sure the server is responding
     def test_index(self):
         res = self.client().get('/test')
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+
+    # Test adding a movie
+    def test_add_movie(self):
+        submission_data = json.dumps(dict(name='test name'))
+        res_submission = self.client().post('/movies',
+                                            data=submission_data,
+                                            content_type='application/json')
+        data = json.loads(res_submission.get_data(as_text=True))
+        self.assertEqual(res_submission.status_code, 200)
         self.assertTrue(data['success'])
 
 # Make the tests conveniently executable
