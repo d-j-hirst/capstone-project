@@ -95,15 +95,70 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsInstance(data['movie_data']['data'][0]['release_date'], str)
         self.assertGreaterEqual(len(data['movie_data']['data'][0]['release_date']), 1)
 
-    # Test adding a movie
+    # Test adding a movie, and check that searching back for it retrieves it
     def test_add_movie(self):
-        submission_data = json.dumps(dict(name='test name'))
+        submission_data = json.dumps(dict(name='added movie'))
         res_submission = self.client().post('/movies',
                                             data=submission_data,
                                             content_type='application/json')
         data = json.loads(res_submission.get_data(as_text=True))
         self.assertEqual(res_submission.status_code, 200)
         self.assertTrue(data['success'])
+        retrieval_data = json.dumps(dict(search_term='added movie'))
+        res_retrieval = self.client().post('/movies/search',
+                                            data=retrieval_data,
+                                            content_type='application/json')
+        data = json.loads(res_retrieval.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movie_data']['count'], int)
+        self.assertGreaterEqual(data['movie_data']['count'], 1)
+        self.assertIsInstance(data['movie_data']['data'], list)
+        self.assertGreaterEqual(len(data['movie_data']['data']), 1)
+        self.assertIsInstance(data['movie_data']['data'][0], object)
+        self.assertIsInstance(data['movie_data']['data'][0]['name'], str)
+        self.assertEqual(data['movie_data']['data'][0]['name'], 'added movie')
+
+    # Test adding a movie, editing it, and check that searching back for the edited movie retrieves it
+    def test_edit_movie(self):
+        submission_data = json.dumps(dict(name='movie for editing'))
+        res_submission = self.client().post('/movies',
+                                            data=submission_data,
+                                            content_type='application/json')
+        data = json.loads(res_submission.get_data(as_text=True))
+        self.assertEqual(res_submission.status_code, 200)
+        self.assertTrue(data['success'])
+        # need to get the id for the created movie
+        retrieval_data = json.dumps(dict(search_term='movie for editing'))
+        res_retrieval = self.client().post('/movies/search',
+                                            data=retrieval_data,
+                                            content_type='application/json')
+        data = json.loads(res_retrieval.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        item_id = data['movie_data']['data'][0]['id']
+        patch_data = json.dumps(dict(name='movie is edited'))
+        res_patch = self.client().patch('/movies/' + str(item_id),
+                                            data=patch_data,
+                                            content_type='application/json')
+        data = json.loads(res_patch.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        edited_data = json.dumps(dict(search_term='movie is edited'))
+        res_edited = self.client().post('/movies/search',
+                                            data=edited_data,
+                                            content_type='application/json')
+        data = json.loads(res_edited.get_data(as_text=True))
+        self.assertEqual(res_edited.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movie_data']['count'], int)
+        self.assertGreaterEqual(data['movie_data']['count'], 1)
+        self.assertIsInstance(data['movie_data']['data'], list)
+        self.assertGreaterEqual(len(data['movie_data']['data']), 1)
+        self.assertIsInstance(data['movie_data']['data'][0], object)
+        self.assertIsInstance(data['movie_data']['data'][0]['name'], str)
+        self.assertEqual(data['movie_data']['data'][0]['name'], 'movie is edited')
+        
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

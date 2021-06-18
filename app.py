@@ -66,6 +66,25 @@ def create_app(test_config=None):
             'movie_data': movie_data
         })
 
+    @app.route('/movies/<int:movie_id>', methods=['PATCH'])
+    def edit_movie(movie_id):
+        if request.get_json() is None:
+            abort(400)
+        # check the request actually specifies the data needed
+        if not {'name'} <= set(request.get_json()):
+            abort(400)
+        movie = Movie.query.filter_by(id=movie_id).first()
+        name = request.get_json()['name']
+        if not isinstance(name, str):
+            abort(400)
+        db.session.query(Movie).\
+            filter(Movie.id == movie_id).\
+            update({'name': name})
+        db.session.commit()
+        return jsonify({
+            'success': True
+        })
+
     @app.route('/movies', methods=['POST'])
     def add_movie():
         if request.get_json() is None:
