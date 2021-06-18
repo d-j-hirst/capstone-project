@@ -42,6 +42,30 @@ def create_app(test_config=None):
             'movie_data': movie_data
         })
 
+    @app.route('/movies/search', methods=['POST'])
+    def search_movies():
+        if request.get_json() is None:
+            abort(400)
+        if not {'search_term'} <= set(request.get_json()):
+            abort(400)
+        search_term = request.get_json()['search_term']
+        # Case-insenstive search with any characters before or after the search term
+        movies = Movie.query.filter(Movie.name.ilike('%' + search_term + '%')).all()
+        movie_data = {
+            'count': len(movies),
+            'data': []
+        }
+        for movie in movies:
+          movie_data['data'].append({
+              "id": movie.id,
+              "name": movie.name,
+              "release_date": movie.release_date,
+          })
+        return jsonify({
+            'success': True,
+            'movie_data': movie_data
+        })
+
     @app.route('/movies', methods=['POST'])
     def add_movie():
         if request.get_json() is None:

@@ -72,6 +72,29 @@ class TriviaTestCase(unittest.TestCase):
         self.assertGreaterEqual(len(data['movie_data']['name']), 1)
         self.assertIsInstance(data['movie_data']['release_date'], str)
 
+    # Test, when reading a movie, that the 
+    def test_search_movie(self):
+        # Use different capitalization in the search to make sure that works
+        submission_data = json.dumps(dict(search_term='Test Name'))
+        res = self.client().post('/movies/search',
+                                            data=submission_data,
+                                            content_type='application/json')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movie_data'], object)
+        self.assertIsInstance(data['movie_data']['count'], int)
+        self.assertGreaterEqual(data['movie_data']['count'], 1)
+        self.assertIsInstance(data['movie_data']['data'], list)
+        self.assertGreaterEqual(len(data['movie_data']['data']), 1)
+        self.assertIsInstance(data['movie_data']['data'][0], object)
+        self.assertIsInstance(data['movie_data']['data'][0]['id'], int)
+        self.assertGreaterEqual(data['movie_data']['data'][0]['id'], 1)
+        self.assertIsInstance(data['movie_data']['data'][0]['name'], str)
+        self.assertGreaterEqual(len(data['movie_data']['data'][0]['name']), 9)
+        self.assertIsInstance(data['movie_data']['data'][0]['release_date'], str)
+        self.assertGreaterEqual(len(data['movie_data']['data'][0]['release_date']), 1)
+
     # Test adding a movie
     def test_add_movie(self):
         submission_data = json.dumps(dict(name='test name'))
