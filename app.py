@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, redirect
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -26,6 +26,22 @@ def create_app(test_config=None):
             'success': 'true'
         })
 
+    @app.route('/movies/<int:movie_id>')
+    def show_movie(movie_id):
+        # shows the artist page with the given artist_id
+        movie = Movie.query.filter_by(id=movie_id).first()
+        if movie is None:
+            return redirect('errors/404')
+        movie_data = {
+            'id': movie.id,
+            'name': movie.name,
+            'release_date': movie.release_date
+        }
+        return jsonify({
+            'success': True,
+            'movie_data': movie_data
+        })
+
     @app.route('/movies', methods=['POST'])
     def add_movie():
         if request.get_json() is None:
@@ -40,7 +56,7 @@ def create_app(test_config=None):
         db.session.add(new_movie)
         db.session.commit()
         return jsonify({
-            'success': 'true'
+            'success': True
         })
 
     return app

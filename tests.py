@@ -1,6 +1,7 @@
 import unittest
 import json
 import os
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app
@@ -57,6 +58,19 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
+
+    # Test, when reading a movie, that the 
+    def test_get_movie(self):
+        res = self.client().get('/movies/1')
+        data = json.loads(res.get_data(as_text=True))
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movie_data'], object)
+        self.assertIsInstance(data['movie_data']['id'], int)
+        self.assertGreaterEqual(data['movie_data']['id'], 1)
+        self.assertIsInstance(data['movie_data']['name'], str)
+        self.assertGreaterEqual(len(data['movie_data']['name']), 1)
+        self.assertIsInstance(data['movie_data']['release_date'], str)
 
     # Test adding a movie
     def test_add_movie(self):
