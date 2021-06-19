@@ -158,6 +158,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsInstance(data['movie_data']['data'][0], object)
         self.assertIsInstance(data['movie_data']['data'][0]['name'], str)
         self.assertEqual(data['movie_data']['data'][0]['name'], 'movie is edited')
+        # Verify original movie name no longer exists
+        retrieval_data = json.dumps(dict(search_term='movie for editing'))
+        res_retrieval = self.client().post('/movies/search',
+                                            data=retrieval_data,
+                                            content_type='application/json')
+        data = json.loads(res_retrieval.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertEqual(data['movie_data']['count'], 0)
+        self.assertEqual(len(data['movie_data']['data']), 0)
         
 
 # Make the tests conveniently executable
