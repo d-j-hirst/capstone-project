@@ -52,13 +52,6 @@ class TriviaTestCase(unittest.TestCase):
     def test_test(self):
         self.assertEqual(200, 200)
 
-    # Test trivial I/O to make sure the server is responding
-    def test_index(self):
-        res = self.client().get('/test')
-        data = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 200)
-        self.assertTrue(data['success'])
-
     # Test, when reading a movie, that it successfully returns a movie
     def test_get_movie(self):
         res = self.client().get('/movies/1')
