@@ -171,6 +171,7 @@ COPY public."People" (id, name, catchphrase) FROM stdin;
 --
 
 COPY public.actors (id, name, age, gender) FROM stdin;
+1	test name	26	gender
 \.
 
 
@@ -188,7 +189,6 @@ COPY public.alembic_version (version_num) FROM stdin;
 
 COPY public.movies (id, name, release_date) FROM stdin;
 1	test name	2021-06-18 00:31:24.527694
-9	test name	2021-06-18 02:39:48.303514
 \.
 
 
@@ -203,14 +203,14 @@ SELECT pg_catalog.setval('public."People_id_seq"', 1, false);
 -- Name: actors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.actors_id_seq', 1, false);
+SELECT pg_catalog.setval('public.actors_id_seq', 2, false);
 
 
 --
 -- Name: movies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.movies_id_seq', 9, true);
+SELECT pg_catalog.setval('public.movies_id_seq', 2, true);
 
 
 --

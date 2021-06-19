@@ -6,6 +6,7 @@ from flask_cors import CORS
 from models import setup_db, Movie
 
 from routes_movies import *
+from routes_actors import *
 from error_handling import *
 
 def create_app(test_config=None):
@@ -21,6 +22,7 @@ def create_app(test_config=None):
 
     #setup routes
     setup_movie_routes(app, db)
+    setup_actor_routes(app, db)
     setup_error_handlers(app)
 
     return app

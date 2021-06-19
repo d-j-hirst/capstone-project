@@ -8,6 +8,7 @@ from app import create_app
 from models import database_path
 from tests_misc import *
 from tests_movies import *
+from tests_actors import *
 
 # Get the database path from an environment variable
 # Heroku automatically generates a DATABASE_URL beginning with
@@ -61,6 +62,33 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_movie_fail(self):
         test_delete_movie_fail(self)
+
+    def test_get_actor(self):
+        test_get_actor(self)
+
+    def test_get_actor_fail(self):
+        test_get_actor_fail(self)
+
+    def test_search_actor(self):
+        test_search_actor(self)
+
+    def test_add_actor(self):
+        test_add_actor(self)
+
+    def test_add_actor_fail(self):
+        test_add_actor_fail(self)
+
+    def test_edit_actor(self):
+        test_edit_actor(self)
+
+    def test_edit_actor_fail(self):
+        test_edit_actor_fail(self)
+
+    def test_delete_actor(self):
+        test_delete_actor(self)
+
+    def test_delete_actor_fail(self):
+        test_delete_actor_fail(self)
         
 
 # Make the tests conveniently executable
