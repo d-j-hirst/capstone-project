@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from models import setup_db, Movie
 
-from movie_routes import *
+from routes_movies import *
 from error_handling import *
 
 def create_app(test_config=None):
