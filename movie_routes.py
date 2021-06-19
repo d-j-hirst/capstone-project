@@ -42,6 +42,23 @@ def setup_movie_routes(app, db):
             'movie_data': movie_data
         })
 
+    @app.route('/movies', methods=['POST'])
+    def add_movie():
+        if request.get_json() is None:
+            abort(400)
+        # check the request actually specifies the data needed
+        if not {'name'} <= set(request.get_json()):
+            abort(400)
+        name = request.get_json()['name']
+        if not isinstance(name, str):
+            abort(400)
+        new_movie = Movie(name=name)
+        db.session.add(new_movie)
+        db.session.commit()
+        return jsonify({
+            'success': True
+        })
+
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
     def edit_movie(movie_id):
         if request.get_json() is None:
@@ -65,18 +82,14 @@ def setup_movie_routes(app, db):
             'success': True
         })
 
-    @app.route('/movies', methods=['POST'])
-    def add_movie():
-        if request.get_json() is None:
-            abort(400)
-        # check the request actually specifies the data needed
-        if not {'name'} <= set(request.get_json()):
-            abort(400)
-        name = request.get_json()['name']
-        if not isinstance(name, str):
-            abort(400)
-        new_movie = Movie(name=name)
-        db.session.add(new_movie)
+    @app.route('/movies/<int:movie_id>', methods=['DELETE'])
+    def delete_movie(movie_id):
+        # Check there is a movie with requested id
+        movie = Movie.query.filter_by(id=movie_id).first()
+        if movie is None:
+            abort(404)
+        db.session.query(Movie).\
+            filter(Movie.id == movie_id).delete()
         db.session.commit()
         return jsonify({
             'success': True

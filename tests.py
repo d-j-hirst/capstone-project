@@ -36,6 +36,14 @@ def test_error_format(test_obj, res, code):
     test_obj.assertIsInstance(data['message'], str)
     test_obj.assertEqual(data['message'], error_names[code])
 
+# Test that this object "obj" is in fact a valid representation of a movie
+def test_is_valid_movie(test_obj, obj):
+    test_obj.assertIsInstance(obj, object)
+    test_obj.assertIsInstance(obj['id'], int)
+    test_obj.assertGreaterEqual(obj['id'], 1)
+    test_obj.assertIsInstance(obj['name'], str)
+    test_obj.assertGreaterEqual(len(obj['name']), 1)
+    test_obj.assertIsInstance(obj['release_date'], str)
 
 class TriviaTestCase(unittest.TestCase):
 
@@ -58,12 +66,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.get_data(as_text=True))
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
-        self.assertIsInstance(data['movie_data'], object)
-        self.assertIsInstance(data['movie_data']['id'], int)
-        self.assertGreaterEqual(data['movie_data']['id'], 1)
-        self.assertIsInstance(data['movie_data']['name'], str)
-        self.assertGreaterEqual(len(data['movie_data']['name']), 1)
-        self.assertIsInstance(data['movie_data']['release_date'], str)
+        test_is_valid_movie(self, data['movie_data'])
 
     def test_get_movie_fail(self):
         res = self.client().get('/movies/100000')
@@ -183,7 +186,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['movie_data']['count'], 0)
         self.assertEqual(len(data['movie_data']['data']), 0)
 
-    def test_patch_movie_fail(self):
+    def test_edit_movie_fail(self):
         # should fail if there is no data passed at all
         res_no_data = self.client().patch('/movies/1')
         test_error_format(self, res_no_data, 400)
@@ -205,6 +208,40 @@ class TriviaTestCase(unittest.TestCase):
                                             data=good_data,
                                             content_type='application/json')
         test_error_format(self, res_wrong_type, 404)
+
+    # Test adding a movie, deleting it, and check that searching back for the deleted movie does not return it
+    def test_delete_movie(self):
+        submission_data = json.dumps(dict(name='movie for deleting'))
+        res_submission = self.client().post('/movies',
+                                            data=submission_data,
+                                            content_type='application/json')
+        data = json.loads(res_submission.get_data(as_text=True))
+        self.assertEqual(res_submission.status_code, 200)
+        self.assertTrue(data['success'])
+        # need to get the id for the created movie
+        retrieval_data = json.dumps(dict(search_term='movie for deleting'))
+        res_retrieval = self.client().post('/movies/search',
+                                            data=retrieval_data,
+                                            content_type='application/json')
+        data = json.loads(res_retrieval.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        item_id = data['movie_data']['data'][0]['id']
+        # delete the movie at the given id
+        res_patch = self.client().delete('/movies/' + str(item_id))
+        data = json.loads(res_patch.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        # Verify original movie name no longer exists
+        retrieval_data = json.dumps(dict(search_term='movie for deleting'))
+        res_retrieval = self.client().post('/movies/search',
+                                            data=retrieval_data,
+                                            content_type='application/json')
+        data = json.loads(res_retrieval.get_data(as_text=True))
+        self.assertEqual(res_retrieval.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertEqual(data['movie_data']['count'], 0)
+        self.assertEqual(len(data['movie_data']['data']), 0)
         
 
 # Make the tests conveniently executable
