@@ -59,7 +59,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
 
-    # Test, when reading a movie, that the 
+    # Test, when reading a movie, that it successfully returns a movie
     def test_get_movie(self):
         res = self.client().get('/movies/1')
         data = json.loads(res.get_data(as_text=True))
@@ -71,6 +71,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsInstance(data['movie_data']['name'], str)
         self.assertGreaterEqual(len(data['movie_data']['name']), 1)
         self.assertIsInstance(data['movie_data']['release_date'], str)
+
+    def test_get_movie_fail(self):
+        res = self.client().get('/movies/100000')
+        test_error_format(self, res, 404)
 
     # Test, when reading a movie, that the 
     def test_search_movie(self):
@@ -118,6 +122,23 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsInstance(data['movie_data']['data'][0], object)
         self.assertIsInstance(data['movie_data']['data'][0]['name'], str)
         self.assertEqual(data['movie_data']['data'][0]['name'], 'added movie')
+
+    def test_add_movie_fail(self):
+        # should fail if there is no data passed at all
+        res_no_data = self.client().post('/movies')
+        test_error_format(self, res_no_data, 400)
+        # should fail if there is no 'name' parameter
+        wrong_type_data = json.dumps(dict(bad_name='2'))
+        res_wrong_type = self.client().post('/movies',
+                                            data=wrong_type_data,
+                                            content_type='application/json')
+        test_error_format(self, res_wrong_type, 400)
+        # should fail if there is no 'name' parameter
+        wrong_type_data = json.dumps(dict(name=2))
+        res_wrong_type = self.client().post('/movies',
+                                            data=wrong_type_data,
+                                            content_type='application/json')
+        test_error_format(self, res_wrong_type, 400)
 
     # Test adding a movie, editing it, and check that searching back for the edited movie retrieves it
     def test_edit_movie(self):
@@ -168,6 +189,29 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['success'])
         self.assertEqual(data['movie_data']['count'], 0)
         self.assertEqual(len(data['movie_data']['data']), 0)
+
+    def test_patch_movie_fail(self):
+        # should fail if there is no data passed at all
+        res_no_data = self.client().patch('/movies/1')
+        test_error_format(self, res_no_data, 400)
+        # should fail if there is no 'name' parameter
+        wrong_type_data = json.dumps(dict(bad_name='2'))
+        res_wrong_type = self.client().patch('/movies/1',
+                                            data=wrong_type_data,
+                                            content_type='application/json')
+        test_error_format(self, res_wrong_type, 400)
+        # should fail if there is no 'name' parameter
+        wrong_type_data = json.dumps(dict(name=2))
+        res_wrong_type = self.client().patch('/movies/1',
+                                            data=wrong_type_data,
+                                            content_type='application/json')
+        test_error_format(self, res_wrong_type, 400)
+        # should fail if no movie with correct id is present
+        good_data = json.dumps(dict(name='movie for editing'))
+        res_wrong_type = self.client().patch('/movies/100000',
+                                            data=good_data,
+                                            content_type='application/json')
+        test_error_format(self, res_wrong_type, 404)
         
 
 # Make the tests conveniently executable
