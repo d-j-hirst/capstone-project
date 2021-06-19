@@ -33,9 +33,9 @@ def setup_movie_routes(app, db):
         }
         for movie in movies:
           movie_data['data'].append({
-              "id": movie.id,
-              "name": movie.name,
-              "release_date": movie.release_date,
+              'id': movie.id,
+              'name': movie.name,
+              'release_date': movie.release_date,
           })
         return jsonify({
             'success': True,
