@@ -1,8 +1,10 @@
 from models import Actor
 from flask import abort, jsonify, request
+from auth import requires_auth
 
 def setup_actor_routes(app, db):
     @app.route('/actors/<int:actor_id>')
+    @requires_auth('get:actors')
     def show_actor(actor_id):
         # shows the artist page with the given artist_id
         actor = Actor.query.filter_by(id=actor_id).first()
@@ -20,6 +22,7 @@ def setup_actor_routes(app, db):
         })
 
     @app.route('/actors/search', methods=['POST'])
+    @requires_auth('get:actors')
     def search_actors():
         if request.get_json() is None:
             abort(400)
@@ -45,6 +48,7 @@ def setup_actor_routes(app, db):
         })
 
     @app.route('/actors', methods=['POST'])
+    @requires_auth('post:actors')
     def add_actor():
         if request.get_json() is None:
             abort(400)
@@ -65,6 +69,7 @@ def setup_actor_routes(app, db):
         })
 
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
+    @requires_auth('patch:actors')
     def edit_actor(actor_id):
         if request.get_json() is None:
             abort(400)
@@ -90,6 +95,7 @@ def setup_actor_routes(app, db):
         })
 
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
+    @requires_auth('delete:actors')
     def delete_actor(actor_id):
         # Check there is a actor with requested id
         actor = Actor.query.filter_by(id=actor_id).first()

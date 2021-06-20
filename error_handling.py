@@ -1,4 +1,5 @@
 from flask import jsonify
+from auth import AuthError
 
 def error_400():
     return jsonify({
@@ -31,6 +32,14 @@ def error_500():
         'message': 'Internal Server Error'
     }), 500
 
+def error_auth(e):
+    return jsonify({
+        "success": False,
+        "error": e.status_code,
+        "message": e.error
+    }), e.status_code
+
+
 def setup_error_handlers(app):
     @app.errorhandler(400)
     def error_handler_400(error):
@@ -47,4 +56,9 @@ def setup_error_handlers(app):
     @app.errorhandler(500)
     def error_handler_500(error):
         return error_500()
+
+    @app.errorhandler(AuthError)
+    def error_handler_auth(e):
+        return error_auth(e)
+
     return app

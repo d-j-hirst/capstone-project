@@ -1,8 +1,10 @@
 from models import Movie
 from flask import abort, jsonify, request
+from auth import requires_auth
 
 def setup_movie_routes(app, db):
     @app.route('/movies/<int:movie_id>')
+    @requires_auth('get:movies')
     def show_movie(movie_id):
         # shows the artist page with the given artist_id
         movie = Movie.query.filter_by(id=movie_id).first()
@@ -19,6 +21,7 @@ def setup_movie_routes(app, db):
         })
 
     @app.route('/movies/search', methods=['POST'])
+    @requires_auth('get:movies')
     def search_movies():
         if request.get_json() is None:
             abort(400)
@@ -43,6 +46,7 @@ def setup_movie_routes(app, db):
         })
 
     @app.route('/movies', methods=['POST'])
+    @requires_auth('post:movies')
     def add_movie():
         if request.get_json() is None:
             abort(400)
@@ -60,6 +64,7 @@ def setup_movie_routes(app, db):
         })
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
+    @requires_auth('patch:movies')
     def edit_movie(movie_id):
         if request.get_json() is None:
             abort(400)
@@ -83,6 +88,7 @@ def setup_movie_routes(app, db):
         })
 
     @app.route('/movies/<int:movie_id>', methods=['DELETE'])
+    @requires_auth('delete:movies')
     def delete_movie(movie_id):
         # Check there is a movie with requested id
         movie = Movie.query.filter_by(id=movie_id).first()
