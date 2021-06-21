@@ -75,6 +75,8 @@ def test_add_actor(test_obj):
                                         content_type='application/json')
     data = json.loads(res_submission.get_data(as_text=True))
     test_is_success_response(test_obj, res_submission, data)
+    test_obj.assertIsInstance(data['id'], int)
+    test_obj.assertGreaterEqual(data['id'], 2) # already one entry in the database
     retrieval_data = json.dumps(dict(search_term='added actor'))
     res_retrieval = test_obj.client().post('/actors/search',
                                         data=retrieval_data,

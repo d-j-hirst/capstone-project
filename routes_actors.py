@@ -65,7 +65,8 @@ def setup_actor_routes(app, db):
         db.session.add(new_actor)
         db.session.commit()
         return jsonify({
-            'success': True
+            'success': True,
+            'id': new_actor.id
         })
 
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])

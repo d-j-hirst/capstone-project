@@ -174,6 +174,7 @@ COPY public.actors (id, name, age, gender) FROM stdin;
 1	actor for viewing	26	gender
 2	actor for editing	26	gender
 3	actor for deleting	26	gender
+4	actor for deleting 2	26	gender
 \.
 
 
@@ -207,7 +208,7 @@ SELECT pg_catalog.setval('public."People_id_seq"', 1, false);
 -- Name: actors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.actors_id_seq', 4, false);
+SELECT pg_catalog.setval('public.actors_id_seq', 5, false);
 
 
 --

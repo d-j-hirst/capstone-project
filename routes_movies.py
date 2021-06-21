@@ -60,7 +60,8 @@ def setup_movie_routes(app, db):
         db.session.add(new_movie)
         db.session.commit()
         return jsonify({
-            'success': True
+            'success': True,
+            'id': new_movie.id
         })
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
