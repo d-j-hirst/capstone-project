@@ -28,6 +28,8 @@ def setup_movie_routes(app, db):
         if not {'search_term'} <= set(request.get_json()):
             abort(400)
         search_term = request.get_json()['search_term']
+        if not isinstance(search_term, str):
+            abort(400)
         # Case-insenstive search with any characters before or after the search term
         movies = Movie.query.filter(Movie.name.ilike('%' + search_term + '%')).all()
         movie_data = {

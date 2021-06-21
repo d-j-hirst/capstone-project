@@ -45,6 +45,9 @@ class TriviaTestCase(unittest.TestCase):
     def test_search_movie(self):
         test_search_movie(self)
 
+    def test_search_movie_fail(self):
+        test_search_movie_fail(self)
+
     def test_add_movie(self):
         test_add_movie(self)
 
@@ -71,6 +74,9 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_search_actor(self):
         test_search_actor(self)
+
+    def test_search_actor_fail(self):
+        test_search_actor_fail(self)
 
     def test_add_actor(self):
         test_add_actor(self)

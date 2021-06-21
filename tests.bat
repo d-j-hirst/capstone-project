@@ -13,7 +13,7 @@ createdb -U postgres capstone_test_db
 ::  --quiet suppresses display of SQL commands
 ::  -o NUL suppresses
 ::  -d capstone_test_db < test_db.sql gives the database name and the dump file
-psql -U postgres --set ON_ERROR_STOP=on --quiet -o NUL -d capstone_test_db < capstone_test_db.sql
+psql -U postgres --set ON_ERROR_STOP=on --quiet -o NUL -d capstone_test_db < test_db.sql
 :: if any above commands produced an error, don't bother to run tests, instead give a message and exit
 :: also, don't echo the if block itself, only the actual commands
 @echo off

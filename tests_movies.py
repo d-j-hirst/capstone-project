@@ -30,15 +30,6 @@ def test_is_valid_movie_collection(test_obj, obj):
     for data_item in obj['data']:
         test_is_valid_movie(test_obj, data_item)
 
-def get_id_for_movie(test_obj, movie_title):
-    retrieval_data = json.dumps(dict(search_term=movie_title))
-    res = test_obj.client().post('/movies/search',
-                                        data=retrieval_data,
-                                        content_type='application/json')
-    data = json.loads(res.get_data(as_text=True))
-    test_is_success_response(test_obj, res, data)
-    return data['movie_data']['data'][0]['id']
-
 # *****************************************
 # Top-level tests
 # *****************************************
@@ -57,13 +48,30 @@ def test_get_movie_fail(test_obj):
 # Test, when reading a movie, that the 
 def test_search_movie(test_obj):
     # Use different capitalization in the search to make sure that works
-    submission_data = json.dumps(dict(search_term='Test Name'))
+    submission_data = json.dumps(dict(search_term='Movie For Viewing'))
     res = test_obj.client().post('/movies/search',
                                         data=submission_data,
                                         content_type='application/json')
     data = json.loads(res.get_data(as_text=True))
     test_is_success_response(test_obj, res, data)
     test_is_valid_movie_collection(test_obj, data['movie_data'])
+
+def test_search_movie_fail(test_obj):
+    # should fail if there is no 'search_term' parameter
+    submission_data = json.dumps(dict(bad_search='Movie For Viewing'))
+    res_no_parameter = test_obj.client().post('/movies/search',
+                                        data=submission_data,
+                                        content_type='application/json')
+    test_error_format(test_obj, res_no_parameter, 400)
+    # should fail if the search term is wrong type
+    submission_data = json.dumps(dict(search_term=4))
+    res_bad_type = test_obj.client().post('/movies/search',
+                                        data=submission_data,
+                                        content_type='application/json')
+    test_error_format(test_obj, res_bad_type, 400)
+    # should fail if there is no data provided
+    res_no_data = test_obj.client().post('/movies/search')
+    test_error_format(test_obj, res_no_data, 400)
 
 # Test adding a movie, and check that searching back for it retrieves it
 def test_add_movie(test_obj):
@@ -101,26 +109,15 @@ def test_add_movie_fail(test_obj):
                                         content_type='application/json')
     test_error_format(test_obj, res_wrong_type, 400)
 
-# Test adding a movie, editing it, and check that searching back for the edited movie retrieves it
+# Test editing a movie, and check that searching back for the edited movie retrieves it
 def test_edit_movie(test_obj):
-    # post a specific movie to patch
-    submission_data = json.dumps(dict(name='movie for editing'))
-    res_submission = test_obj.client().post('/movies',
-                                        data=submission_data,
-                                        content_type='application/json')
-    data = json.loads(res_submission.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
-
-    # need to get the id for the created movie
-    item_id = get_id_for_movie(test_obj, 'movie for editing')
-
-    # use the id to patch the movie
+    # the batch file should have set up a move with id 2 and name 'movie for editing'
     patch_data = json.dumps(dict(name='movie is edited'))
-    res_patch = test_obj.client().patch('/movies/' + str(item_id),
+    res_patch = test_obj.client().patch('/movies/2',
                                         data=patch_data,
                                         content_type='application/json')
     data = json.loads(res_patch.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
+    test_is_success_response(test_obj, res_patch, data)
 
     # verify move can be found under the new name
     edited_data = json.dumps(dict(search_term='movie is edited'))
@@ -128,7 +125,7 @@ def test_edit_movie(test_obj):
                                         data=edited_data,
                                         content_type='application/json')
     data = json.loads(res_edited.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
+    test_is_success_response(test_obj, res_edited, data)
     test_is_valid_movie_collection(test_obj, data['movie_data'])
     test_obj.assertEqual(data['movie_data']['data'][0]['name'], 'movie is edited')
 
@@ -138,7 +135,7 @@ def test_edit_movie(test_obj):
                                         data=retrieval_data,
                                         content_type='application/json')
     data = json.loads(res_retrieval.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
+    test_is_success_response(test_obj, res_retrieval, data)
     test_obj.assertEqual(data['movie_data']['count'], 0)
     test_obj.assertEqual(len(data['movie_data']['data']), 0)
 
@@ -165,23 +162,12 @@ def test_edit_movie_fail(test_obj):
                                         content_type='application/json')
     test_error_format(test_obj, res_wrong_type, 404)
 
-# Test adding a movie, deleting it, and check that searching back for the deleted movie does not return it
+# Test deleting a movie, and check that searching back for the deleted movie does not return it
 def test_delete_movie(test_obj):
-    # post a specific movie to delete
-    submission_data = json.dumps(dict(name='movie for deleting'))
-    res_submission = test_obj.client().post('/movies',
-                                        data=submission_data,
-                                        content_type='application/json')
-    data = json.loads(res_submission.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
-
-    # need to get the id for the created movie
-    item_id = get_id_for_movie(test_obj, 'movie for deleting')
-
-    # delete the movie at the given id
-    res_patch = test_obj.client().delete('/movies/' + str(item_id))
+    # the batch file should have set up a move with id 3 and name 'movie for editing'
+    res_patch = test_obj.client().delete('/movies/3')
     data = json.loads(res_patch.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
+    test_is_success_response(test_obj, res_patch, data)
 
     # Verify original movie name no longer exists
     retrieval_data = json.dumps(dict(search_term='movie for deleting'))
@@ -189,7 +175,7 @@ def test_delete_movie(test_obj):
                                         data=retrieval_data,
                                         content_type='application/json')
     data = json.loads(res_retrieval.get_data(as_text=True))
-    test_is_success_response(test_obj, res_submission, data)
+    test_is_success_response(test_obj, res_retrieval, data)
     test_obj.assertEqual(data['movie_data']['count'], 0)
     test_obj.assertEqual(len(data['movie_data']['data']), 0)
 
