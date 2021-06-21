@@ -2,7 +2,7 @@
 :: replace "postgres" with user name and "a" with required password
 :: if no password, then remove the following line ("set PGPASSWORD=a")
 @set PGPASSWORD=a
-@set CAPSTONE_RBAC_CHECK=1
+@set CAPSTONE_RBAC_SKIP=0
 :: drop and recreate the database ready for the standard dump file to be added
 dropdb -U postgres db
 createdb -U postgres db
