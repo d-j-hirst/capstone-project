@@ -2,6 +2,8 @@
 :: replace "postgres" with user name and "a" with required password
 :: if no password, then remove the following line ("set PGPASSWORD=a")
 @set PGPASSWORD=a
+:: turn off authorization checks for this run-through
+@set CAPSTONE_RBAC_CHECK=0
 :: drop and recreate the database ready for the standard dump file to be added
 dropdb -U postgres capstone_test_db
 createdb -U postgres capstone_test_db
@@ -23,3 +25,5 @@ if %errorlevel% neq 0 (
 @echo on
 :: If all is successful, actually run the tests
 python tests.py
+:: turn on authorization checks when subsequently running
+@set CAPSTONE_RBAC_CHECK=1

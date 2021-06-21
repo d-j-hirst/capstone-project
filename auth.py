@@ -1,4 +1,5 @@
 import json
+import os
 from flask import request, abort
 from functools import wraps
 from jose import jwt
@@ -8,8 +9,7 @@ from urllib.request import urlopen
 # This variable is for development and testing only. Remove in production
 # For development, set to False for easy testing of endpoint function
 # and True to test role-based user access
-auth_master = True
-
+auth_master = (int(os.environ.get('CAPSTONE_RBAC_CHECK')) == 1)
 
 AUTH0_DOMAIN = 'fsnd-djh.au.auth0.com'
 ALGORITHMS = ['RS256']
