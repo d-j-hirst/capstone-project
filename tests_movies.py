@@ -75,7 +75,7 @@ def test_search_movie_fail(test_obj):
 
 # Test adding a movie, and check that searching back for it retrieves it
 def test_add_movie(test_obj):
-    submission_data = json.dumps(dict(name='added movie'))
+    submission_data = json.dumps(dict(name='added movie', release_date='2022-01-01'))
     res_submission = test_obj.client().post('/movies',
                                         data=submission_data,
                                         content_type='application/json')
@@ -97,22 +97,28 @@ def test_add_movie_fail(test_obj):
     res_no_data = test_obj.client().post('/movies')
     test_error_format(test_obj, res_no_data, 400)
     # should fail if there is no 'name' parameter
-    wrong_type_data = json.dumps(dict(bad_name='2'))
+    wrong_type_data = json.dumps(dict(bad_name='2', release_date='2022-01-01'))
     res_wrong_type = test_obj.client().post('/movies',
                                         data=wrong_type_data,
                                         content_type='application/json')
     test_error_format(test_obj, res_wrong_type, 400)
     # should fail if 'name' parameter is wrong type
-    wrong_type_data = json.dumps(dict(name=2))
-    res_wrong_type = test_obj.client().post('/movies',
+    wrong_type_data = json.dumps(dict(name=2, release_date='2022-01-01'))
+    res_wrong_type_name = test_obj.client().post('/movies',
                                         data=wrong_type_data,
                                         content_type='application/json')
-    test_error_format(test_obj, res_wrong_type, 400)
+    test_error_format(test_obj, res_wrong_type_name, 400)
+    # should fail if 'release_date' parameter is wrong type
+    wrong_type_data = json.dumps(dict(name='valid name', release_date=4))
+    res_wrong_type_release_date = test_obj.client().post('/movies',
+                                        data=wrong_type_data,
+                                        content_type='application/json')
+    test_error_format(test_obj, res_wrong_type_release_date, 400)
 
 # Test editing a movie, and check that searching back for the edited movie retrieves it
 def test_edit_movie(test_obj):
     # the batch file should have set up a move with id 2 and name 'movie for editing'
-    patch_data = json.dumps(dict(name='movie is edited'))
+    patch_data = json.dumps(dict(name='movie is edited', release_date='2022-01-01'))
     res_patch = test_obj.client().patch('/movies/2',
                                         data=patch_data,
                                         content_type='application/json')
@@ -144,19 +150,25 @@ def test_edit_movie_fail(test_obj):
     res_no_data = test_obj.client().patch('/movies/1')
     test_error_format(test_obj, res_no_data, 400)
     # should fail if there is no 'name' parameter
-    wrong_type_data = json.dumps(dict(bad_name='2'))
+    wrong_type_data = json.dumps(dict(bad_name='2', release_date='2022-01-01'))
     res_wrong_type = test_obj.client().patch('/movies/1',
                                         data=wrong_type_data,
                                         content_type='application/json')
     test_error_format(test_obj, res_wrong_type, 400)
-    # should fail if there is no 'name' parameter
-    wrong_type_data = json.dumps(dict(name=2))
-    res_wrong_type = test_obj.client().patch('/movies/1',
-                                        data=wrong_type_data,
+    # should fail if the 'name' parameter is of the wrong type
+    wrong_type_name_data = json.dumps(dict(name=2, release_date='2022-01-01'))
+    res_wrong_type_name = test_obj.client().patch('/movies/1',
+                                        data=wrong_type_name_data,
                                         content_type='application/json')
-    test_error_format(test_obj, res_wrong_type, 400)
+    test_error_format(test_obj, res_wrong_type_name, 400)
+    # should fail if the 'release_date' parameter is of the wrong type
+    wrong_type_name_data = json.dumps(dict(name='valid name', release_date=2))
+    res_wrong_type_name = test_obj.client().patch('/movies/1',
+                                        data=wrong_type_name_data,
+                                        content_type='application/json')
+    test_error_format(test_obj, res_wrong_type_name, 400)
     # should fail if no movie with correct id is present
-    good_data = json.dumps(dict(name='movie for editing'))
+    good_data = json.dumps(dict(name='movie for editing', release_date='2022-01-01'))
     res_wrong_type = test_obj.client().patch('/movies/100000',
                                         data=good_data,
                                         content_type='application/json')

@@ -53,12 +53,15 @@ def setup_movie_routes(app, db):
         if request.get_json() is None:
             abort(400)
         # check the request actually specifies the data needed
-        if not {'name'} <= set(request.get_json()):
+        if not {'name', 'release_date'} <= set(request.get_json()):
             abort(400)
         name = request.get_json()['name']
         if not isinstance(name, str):
             abort(400)
-        new_movie = Movie(name=name)
+        release_date = request.get_json()['release_date']
+        if not (isinstance(release_date, str)):
+            abort(400)
+        new_movie = Movie(name=name, release_date=release_date)
         db.session.add(new_movie)
         db.session.commit()
         return jsonify({
@@ -72,11 +75,14 @@ def setup_movie_routes(app, db):
         if request.get_json() is None:
             abort(400)
         # check the request actually specifies the data needed
-        if not {'name'} <= set(request.get_json()):
+        if not {'name', 'release_date'} <= set(request.get_json()):
             abort(400)
         movie = Movie.query.filter_by(id=movie_id).first()
         name = request.get_json()['name']
         if not isinstance(name, str):
+            abort(400)
+        release_date = request.get_json()['release_date']
+        if not (isinstance(release_date, str)):
             abort(400)
         # Check there is a movie with requested id
         movie = Movie.query.filter_by(id=movie_id).first()
@@ -84,7 +90,7 @@ def setup_movie_routes(app, db):
             abort(404)
         db.session.query(Movie).\
             filter(Movie.id == movie_id).\
-            update({'name': name})
+            update({'name': name, 'release_date': release_date})
         db.session.commit()
         return jsonify({
             'success': True

@@ -27,7 +27,7 @@ class Movie(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    release_date = Column(DateTime(), default=datetime.datetime.now(datetime.timezone.utc))
+    release_date = Column(DateTime)
 
 class Actor(db.Model):
     __tablename__ = 'actors'
