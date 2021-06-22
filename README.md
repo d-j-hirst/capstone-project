@@ -67,8 +67,8 @@ These following instructions are for setting up the backend server for external 
 ## Running local and remote RBAC tests
 
 * To run the RBAC (role-based access control) tests, use [Postman](https://www.postman.com).
-  * To test the local server, import ``udacity-fsnd-capstone-local`` into Postman, and run the tests for the whole collection (there should be 55 tests in total). Note that this requires the external testing server to be running as described above. Also, running the tests will delete entries that the ``delete`` tests rely on, so the server will need to be restarted to run them again.
-  * To test the local server, import ``udacity-fsnd-capstone-remote`` into Postman, and run the tests for the whole collection (again, there should be 55 tests in total).
+  * To test the local server, import ``udacity-fsnd-capstone-local.postman_collection.json`` into Postman, and run the tests for the whole collection (there should be 55 tests in total). Note that this requires the external testing server to be running as described above.
+  * To test the local server, import ``udacity-fsnd-capstone-remote.postman_collection.json`` into Postman, and run the tests for the ``Tests`` folder in the collection (again, there should be 55 tests in total).
 
 ## Backend models
 
