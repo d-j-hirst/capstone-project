@@ -1,10 +1,10 @@
 @ECHO Running full sequence for automated tests
 :: replace "postgres" with user name and "a" with required password
 :: if no password, then remove the following line ("set PGPASSWORD=a")
+@DATABASE_URL=postgresql://postgres:a@localhost:5432/db
 @set PGPASSWORD=a
-:: turn off authorization checks for this run-through
-@set CAPSTONE_RBAC_SKIP=1
 :: drop and recreate the database ready for the standard dump file to be added
+:: again, replace "postgres" with the desired username
 dropdb -U postgres capstone_test_db
 createdb -U postgres capstone_test_db
 :: restore the database from the local dump file
@@ -23,6 +23,8 @@ if %errorlevel% neq 0 (
   exit /b %errorlevel%
 )
 @echo on
+:: turn off authorization checks for this run-through
+@set CAPSTONE_RBAC_SKIP=1
 :: If all is successful, actually run the tests
 python tests.py
 :: turn on authorization checks when subsequently running

@@ -21,6 +21,7 @@ database_path = os.environ.get('DATABASE_URL').replace("s://", "sql://", 1)
 # overwrite persistent data in the regular database
 database_path = database_path.rsplit('/', 1)[0] + '/capstone_test_db'
 
+
 class TriviaTestCase(unittest.TestCase):
 
     # Define test variables and initialize app.
@@ -95,7 +96,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_actor_fail(self):
         test_delete_actor_fail(self)
-        
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

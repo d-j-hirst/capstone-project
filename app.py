@@ -9,6 +9,7 @@ from routes_movies import *
 from routes_actors import *
 from error_handling import *
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -20,12 +21,13 @@ def create_app(test_config=None):
 
     db = SQLAlchemy(app)
 
-    #setup routes
+    # setup routes
     setup_movie_routes(app, db)
     setup_actor_routes(app, db)
     setup_error_handlers(app)
 
     return app
+
 
 if __name__ == '__main__':
     create_app()

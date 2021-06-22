@@ -2,6 +2,7 @@ from models import Actor
 from flask import abort, jsonify, request
 from auth import requires_auth
 
+
 def setup_actor_routes(app, db):
     @app.route('/actors/<int:actor_id>')
     @requires_auth('get:actors')
@@ -31,8 +32,9 @@ def setup_actor_routes(app, db):
         search_term = request.get_json()['search_term']
         if not isinstance(search_term, str):
             abort(400)
-        # Case-insenstive search with any characters before or after the search term
-        actors = Actor.query.filter(Actor.name.ilike('%' + search_term + '%')).all()
+        # Case-insenstive search with any characters
+        # before or after the search term
+        actors = Actor.query.filter(Actor.name.ilike(f'%{search_term}%')).all()
         actor_data = {
             'count': len(actors),
             'data': []

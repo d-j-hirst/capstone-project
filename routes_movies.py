@@ -2,6 +2,7 @@ from models import Movie
 from flask import abort, jsonify, request
 from auth import requires_auth
 
+
 def setup_movie_routes(app, db):
     @app.route('/movies/<int:movie_id>')
     @requires_auth('get:movies')
@@ -30,18 +31,19 @@ def setup_movie_routes(app, db):
         search_term = request.get_json()['search_term']
         if not isinstance(search_term, str):
             abort(400)
-        # Case-insenstive search with any characters before or after the search term
-        movies = Movie.query.filter(Movie.name.ilike('%' + search_term + '%')).all()
+        # Case-insenstive search with any characters
+        # before or after the search term
+        movies = Movie.query.filter(Movie.name.ilike(f'%{search_term}%')).all()
         movie_data = {
             'count': len(movies),
             'data': []
         }
         for movie in movies:
-          movie_data['data'].append({
-              'id': movie.id,
-              'name': movie.name,
-              'release_date': movie.release_date,
-          })
+            movie_data['data'].append({
+                'id': movie.id,
+                'name': movie.name,
+                'release_date': movie.release_date,
+            })
         return jsonify({
             'success': True,
             'movie_data': movie_data

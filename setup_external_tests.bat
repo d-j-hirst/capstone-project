@@ -1,9 +1,10 @@
 @ECHO Preparing database and running server with consistent state for external tests
 :: replace "postgres" with user name and "a" with required password
 :: if no password, then remove the following line ("set PGPASSWORD=a")
+@DATABASE_URL=postgresql://postgres:a@localhost:5432/db
 @set PGPASSWORD=a
-@set CAPSTONE_RBAC_SKIP=0
 :: drop and recreate the database ready for the standard dump file to be added
+:: again, replace "postgres" with the desired username
 dropdb -U postgres db
 createdb -U postgres db
 :: restore the database from the local dump file
@@ -21,5 +22,6 @@ if %errorlevel% neq 0 (
   ECHO Error in creating and restoring test database, abandoning server setup
   exit /b %errorlevel%
 )
+@set CAPSTONE_RBAC_SKIP=0
 @echo on
 flask run

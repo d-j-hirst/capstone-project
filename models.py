@@ -13,6 +13,7 @@ database_path = os.environ.get('DATABASE_URL').replace("s://", "sql://", 1)
 
 db = SQLAlchemy()
 
+
 # setup_db(app)
 # binds a flask application and a SQLAlchemy service
 def setup_db(app, database_path=database_path):
@@ -22,12 +23,14 @@ def setup_db(app, database_path=database_path):
     db.init_app(app)
     db.create_all()
 
+
 class Movie(db.Model):
     __tablename__ = 'movies'
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     release_date = Column(DateTime)
+
 
 class Actor(db.Model):
     __tablename__ = 'actors'
