@@ -1,7 +1,7 @@
 @ECHO Running full sequence for automated tests
 :: replace "postgres" with user name and "a" with required password
 :: if no password, then remove the following line ("set PGPASSWORD=a")
-@DATABASE_URL=postgresql://postgres:a@localhost:5432/db
+@set DATABASE_URL=postgresql://postgres:a@localhost:5432/capstone_test_db
 @set PGPASSWORD=a
 :: drop and recreate the database ready for the standard dump file to be added
 :: again, replace "postgres" with the desired username
